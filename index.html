@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oncological Problems in Children Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .quiz-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        .question {
+            margin-bottom: 30px;
+            display: none;
+        }
+        .question.active {
+            display: block;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .options {
+            margin-bottom: 15px;
+        }
+        .option {
+            padding: 10px;
+            margin-bottom: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+        .option.selected {
+            background-color: #bde0ff;
+        }
+        .option.correct {
+            background-color: #c8ffc8;
+            border-color: green;
+        }
+        .option.incorrect {
+            background-color: #ffcccc;
+            border-color: red;
+        }
+        .feedback {
+            display: none;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            border-left: 5px solid #28a745;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .button-group {
+            display: flex;
+            gap: 8px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            background-color: #2980b9;
+        }
+        .progress {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+        }
+        .progress-bar {
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .topic-title {
+            background-color: #eaf2f8;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2980b9;
+        }
+        .result-container {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .result-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .score {
+            font-size: 50px;
+            color: #3498db;
+            margin: 20px 0;
+        }
+        .restart-btn {
+            margin-top: 20px;
+        }
+        .score-tracker {
+            background-color: #f0f8ff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .skipped-label {
+            display: inline-block;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .mascot-container {
+            position: absolute;
+            right: 20px;
+            bottom: -120px;
+            width: 120px;
+            height: 120px;
+            z-index: 10;
+        }
+        .mascot-gif {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .result-message {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #2c3e50;
+        }
+        .result-gif {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Oncological Problems in Children Quiz</h1>
+        
+        <div class="score-tracker" id="score-tracker">
+            Correct: 0/66 (0%)
+        </div>
+        
+        <div id="question-container"></div>
+        
+        <div class="nav-buttons">
+            <div class="button-group">
+                <button id="first-btn">First</button>
+                <button id="prev-btn">Previous</button>
+            </div>
+            <div class="button-group">
+                <button id="skip-btn">Skip</button>
+                <button id="next-btn" disabled>Next</button>
+                <button id="last-btn">Last</button>
+            </div>
+        </div>
+        
+        <div class="progress">
+            <span id="progress-text">Question 1 of 66</span>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+        </div>
+        
+        <div id="result-container" class="result-container">
+            <div class="result-title">Quiz Completed!</div>
+            <p>You have completed the Oncological Problems in Children Quiz.</p>
+            <div id="score-display" class="score">0/66</div>
+            <p id="skipped-questions-info"></p>
+            <div id="result-message" class="result-message"></div>
+            <img id="result-gif" class="result-gif" src="" alt="Result">
+            <button id="restart-btn" class="restart-btn">Restart Quiz</button>
+        </div>
+        
+        <div class="mascot-container">
+            <img id="mascot-gif" class="mascot-gif" src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcjh1ZHBqbHhvajI2M3k2dWUzMm01cnVtZmU1YTd3eWs1aTB5azZrciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/WNlsQiGMU387hn7UZQ/giphy.gif" alt="Mascot">
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                topic: "Leukemia Introduction",
+                question: "Leukemia is defined as:",
+                options: [
+                    "A malignant increase in the number of platelets",
+                    "A malignant increase in the number of red blood cells",
+                    "A malignant increase in the number of leukocytes, usually at an immature stage, in the bone marrow",
+                    "A malignant increase in the number of mature lymphocytes in the lymph nodes"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Leukemia Introduction",
+                question: "True or False: In leukemia, proliferating mature white blood cells produce increased immunity.",
+                options: ["True", "False"],
+                correctIndex: 1
+            },
+            {
+                topic: "Leukemia Introduction",
+                question: "Which of the following is a risk factor for leukemia?",
+                options: [
+                    "High altitude living",
+                    "Exposure to radiation",
+                    "High vitamin D levels",
+                    "Regular exercise"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Types of Leukemia",
+                question: "Which type of leukemia is the most frequent type of cancer in children?",
+                options: [
+                    "Chronic Myeloid Leukemia",
+                    "Acute Myeloid Leukemia",
+                    "Chronic Lymphocytic Leukemia",
+                    "Acute Lymphocytic Leukemia (ALL)"
+                ],
+                correctIndex: 3
+            },
+            {
+                topic: "Types of Leukemia",
+                question: "True or False: Leukemia is equally common in boys and girls after 1 year of age.",
+                options: ["True", "False"],
+                correctIndex: 1
+            },
+            {
+                topic: "Types of Leukemia",
+                question: "Treatment for leukemia may involve:",
+                options: [
+                    "Chemotherapy only",
+                    "Radiation only",
+                    "Hematopoietic stem cell transplantation only",
+                    "Chemotherapy and possibly radiation and hematopoietic stem cell transplantation"
+                ],
+                correctIndex: 3
+            },
+            {
+                topic: "Classification of Leukemia",
+                question: "Acute leukemia is characterized by:",
+                options: [
+                    "Slow progression with normal functioning blood cells",
+                    "Immature blood cells (blasts) that multiply rapidly and worsen quickly",
+                    "Mature blood cells that accumulate slowly",
+                    "Absence of symptoms for many years"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Classification of Leukemia",
+                question: "True or False: Chronic leukemia always produces early symptoms and is quickly diagnosed.",
+                options: ["True", "False"],
+                correctIndex: 1
+            },
+            {
+                topic: "Classification of Leukemia",
+                question: "In lymphocytic leukemia, which cells are affected?",
+                options: [
+                    "Myeloid cells",
+                    "Lymphoid cells (lymphocytes)",
+                    "Red blood cells",
+                    "Platelets"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Assessment of Leukemia",
+                question: "Which of the following is NOT a common finding in a child with leukemia?",
+                options: [
+                    "Fever and pallor",
+                    "Petechiae (hemorrhage)",
+                    "Bone and joint pain",
+                    "Hypertension"
+                ],
+                correctIndex: 3
+            },
+            {
+                topic: "Assessment of Leukemia",
+                question: "True or False: A child with leukemia may have a normal, elevated, or low WBC count.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Assessment of Leukemia",
+                question: "Which of the following is a typical finding in a child with leukemia?",
+                options: [
+                    "Decreased hemoglobin and hematocrit levels",
+                    "Elevated platelet count",
+                    "Absence of infection",
+                    "No cranial nerve involvement"
+                ],
+                correctIndex: 0
+            },
+            {
+                topic: "Manifestations of Increased Intracranial Pressure",
+                question: "Which of the following is a sign of increased intracranial pressure in infants?",
+                options: [
+                    "Sunken fontanel",
+                    "Tense, bulging fontanel",
+                    "Decreased head circumference",
+                    "Decreased scalp veins"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Manifestations of Increased Intracranial Pressure",
+                question: "True or False: Headache is a common sign of increased intracranial pressure in children.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Manifestations of Increased Intracranial Pressure",
+                question: "Which of the following is a late sign of increased intracranial pressure?",
+                options: [
+                    "Irritability",
+                    "Headache",
+                    "Bradycardia",
+                    "Increased motor response to command"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Infection in Leukemia",
+                question: "Which of the following is NOT a common site for infection in a child with leukemia?",
+                options: [
+                    "Skin",
+                    "Respiratory tract",
+                    "Gastrointestinal tract",
+                    "Urinary tract"
+                ],
+                correctIndex: 3
+            },
+            {
+                topic: "Infection in Leukemia",
+                question: "True or False: A child with leukemia should be encouraged to eat raw fruits and vegetables.",
+                options: ["True", "False"],
+                correctIndex: 1
+            },
+            {
+                topic: "Infection in Leukemia",
+                question: "Which of the following is an appropriate nursing intervention to protect a child with leukemia from infection?",
+                options: [
+                    "Encourage visitors, especially classmates, to boost morale",
+                    "Use strict aseptic technique for all nursing procedures",
+                    "Administer all scheduled immunizations, including live virus vaccines",
+                    "Place the child in a room with other immunocompromised children"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Bleeding in Leukemia",
+                question: "Platelet transfusions for a child with leukemia are generally:",
+                options: [
+                    "Given routinely during all phases of treatment",
+                    "Reserved for active bleeding episodes that don't respond to local treatment",
+                    "Never used due to risk of transfusion reaction",
+                    "Given only after bone marrow transplantation"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Bleeding in Leukemia",
+                question: "True or False: It's important to use rectal thermometers to get accurate temperature readings in children with leukemia.",
+                options: ["True", "False"],
+                correctIndex: 1
+            },
+            {
+                topic: "Bleeding in Leukemia",
+                question: "Which of the following is an appropriate nursing intervention to protect a child with leukemia from bleeding?",
+                options: [
+                    "Encourage the child to use a hard toothbrush for effective cleaning",
+                    "Apply gentle pressure to a needle-stick site for at least 10 minutes",
+                    "Encourage the child to engage in active sports to maintain normalcy",
+                    "Administer nonsteroidal anti-inflammatory drugs for pain relief"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Fatigue and Nutrition in Leukemia",
+                question: "For a child with leukemia who cannot take oral feedings, which of the following may be prescribed?",
+                options: [
+                    "Nothing by mouth until appetite returns",
+                    "Small frequent snacks only",
+                    "Parenteral nutrition or enteral feedings",
+                    "Regular diet with supplements"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Fatigue and Nutrition in Leukemia",
+                question: "True or False: Nursing care activities should be performed exactly as scheduled without modification for a child with leukemia.",
+                options: ["True", "False"],
+                correctIndex: 1
+            },
+            {
+                topic: "Fatigue and Nutrition in Leukemia",
+                question: "Which of the following is an appropriate nutritional approach for a child with leukemia?",
+                options: [
+                    "Large meals three times daily",
+                    "Small meals that require little chewing and are not irritating to oral mucosa",
+                    "High-fiber diet with raw vegetables",
+                    "Liquid diet only"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Chemotherapy",
+                question: "The nadir in chemotherapy refers to:",
+                options: [
+                    "The peak effectiveness of the chemotherapy drug",
+                    "The period of greatest bone marrow suppression when blood cell counts are extremely low",
+                    "The time when medication is administered",
+                    "The point at which the child develops immunity to the drug"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Chemotherapy",
+                question: "True or False: Antiemetics should be administered after beginning chemotherapy when the child shows signs of nausea.",
+                options: ["True", "False"],
+                correctIndex: 1
+            },
+            {
+                topic: "Chemotherapy",
+                question: "Which of the following is NOT typically monitored during chemotherapy?",
+                options: [
+                    "Signs of infection and bleeding",
+                    "Signs of dehydration",
+                    "Signs of mucositis",
+                    "Signs of increased appetite"
+                ],
+                correctIndex: 3
+            },
+            {
+                topic: "Additional Chemotherapy Considerations",
+                question: "Hair loss from chemotherapy typically regrows in:",
+                options: [
+                    "1 month",
+                    "3 to 6 months",
+                    "1 to 2 years",
+                    "Hair loss is always permanent"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Additional Chemotherapy Considerations",
+                question: "True or False: Infection is a major cause of death in the immunosuppressed child receiving chemotherapy.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Additional Chemotherapy Considerations",
+                question: "Which of the following is an important nursing intervention for a child receiving chemotherapy?",
+                options: [
+                    "Restrict visitation to prevent emotional distress",
+                    "Discourage verbalization of feelings",
+                    "Listen to the child and family and encourage them to express their feelings",
+                    "Avoid discussing potential side effects to prevent anxiety"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Hodgkin's Disease",
+                question: "Hodgkin's disease is a malignancy of:",
+                options: [
+                    "Bone marrow",
+                    "Liver tissue",
+                    "Lymph nodes",
+                    "Brain tissue"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Hodgkin's Disease",
+                question: "True or False: Hodgkin's disease is characterized by the presence of Reed-Sternberg cells noted in a lymph node biopsy specimen.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Hodgkin's Disease",
+                question: "Which age group has the peak incidence of Hodgkin's disease?",
+                options: [
+                    "Infants",
+                    "Early childhood (2-5 years)",
+                    "School-age children (6-10 years)",
+                    "Mid-adolescence"
+                ],
+                correctIndex: 3
+            },
+            {
+                topic: "Assessment of Hodgkin's Disease",
+                question: "Which of the following is NOT a typical assessment finding in Hodgkin's disease?",
+                options: [
+                    "Painless enlargement of lymph nodes",
+                    "Nonproductive cough",
+                    "Severe bone pain",
+                    "Enlarged, firm, nontender nodes in the supraclavicular area"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Assessment of Hodgkin's Disease",
+                question: "True or False: In children with Hodgkin's disease, the \"sentinel\" node located near the left clavicle may be the first enlarged node.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Assessment of Hodgkin's Disease",
+                question: "Which of the following systemic symptoms might occur with advanced Hodgkin's disease?",
+                options: [
+                    "Low-grade or intermittent fever",
+                    "Weight gain",
+                    "Increased appetite",
+                    "Hyperactivity"
+                ],
+                correctIndex: 0
+            },
+            {
+                topic: "Interventions for Hodgkin's Disease",
+                question: "For early stages of Hodgkin's disease without mediastinal node involvement, the treatment of choice is:",
+                options: [
+                    "Surgical resection only",
+                    "Chemotherapy only",
+                    "Extensive external radiation of the involved lymph node regions",
+                    "Bone marrow transplantation"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Interventions for Hodgkin's Disease",
+                question: "True or False: Malaise is a common adverse effect of extensive irradiation for Hodgkin's disease.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Interventions for Hodgkin's Disease",
+                question: "Which of the following is an important monitoring intervention for a child receiving treatment for Hodgkin's disease?",
+                options: [
+                    "Monitor for medication-induced pancytopenia",
+                    "Encourage high-impact exercise",
+                    "Restrict fluid intake",
+                    "Administer laxatives routinely"
+                ],
+                correctIndex: 0
+            },
+            {
+                topic: "Nephroblastoma (Wilms' Tumor)",
+                question: "Wilms' tumor is:",
+                options: [
+                    "A brain tumor",
+                    "A bone tumor",
+                    "The most common intra-abdominal and kidney tumor of childhood",
+                    "A tumor of the lymphatic system"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Nephroblastoma (Wilms' Tumor)",
+                question: "True or False: The peak incidence of Wilms' tumor is 10 years of age.",
+                options: ["True", "False"],
+                correctIndex: 1
+            },
+            {
+                topic: "Nephroblastoma (Wilms' Tumor)",
+                question: "Therapeutic management of Wilms' tumor includes:",
+                options: [
+                    "Surgery only",
+                    "Chemotherapy only",
+                    "Radiation only",
+                    "A combined treatment of surgery and chemotherapy with or without radiation"
+                ],
+                correctIndex: 3
+            },
+            {
+                topic: "Assessment of Wilms' Tumor",
+                question: "Which of the following is a characteristic finding of the abdominal mass in Wilms' tumor?",
+                options: [
+                    "Soft, tender mass confined to both sides",
+                    "Firm, nontender mass confined to one side",
+                    "Pulsating mass located midline",
+                    "Small, mobile mass that changes location"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Assessment of Wilms' Tumor",
+                question: "True or False: Hypertension in a child with Wilms' tumor may be caused by secretion of excess amounts of renin by the tumor.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Assessment of Wilms' Tumor",
+                question: "Which of the following symptoms might indicate lung metastasis in a child with Wilms' tumor?",
+                options: [
+                    "Headache",
+                    "Abdominal pain",
+                    "Dyspnea and pain in the chest",
+                    "Joint pain"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Interventions for Wilms' Tumor",
+                question: "Which of the following is an important preoperative intervention for a child with Wilms' tumor?",
+                options: [
+                    "Encourage palpation of the abdomen to monitor tumor growth",
+                    "Avoid palpation of the abdomen",
+                    "Restrict fluid intake",
+                    "Administer laxatives to clear the bowel"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Interventions for Wilms' Tumor",
+                question: "True or False: Postoperative care for a child with Wilms' tumor includes monitoring for signs of intestinal obstruction.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Interventions for Wilms' Tumor",
+                question: "An important nursing intervention in the postoperative care of a child with Wilms' tumor is:",
+                options: [
+                    "Encouraging frequent position changes to prevent pneumonia",
+                    "Monitoring temperature and blood pressure closely",
+                    "Encouraging early ambulation",
+                    "Restricting fluid intake to prevent kidney overload"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Neuroblastoma",
+                question: "Neuroblastoma originates from:",
+                options: [
+                    "Bone marrow cells",
+                    "Embryonic neural crest cells",
+                    "Kidney cells",
+                    "Liver cells"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Neuroblastoma",
+                question: "True or False: Most neuroblastomas develop in the adrenal gland or the retroperitoneal sympathetic chain.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Neuroblastoma",
+                question: "Which of the following is true regarding surgical treatment for neuroblastoma?",
+                options: [
+                    "Surgery is never performed due to the sensitive location of the tumor",
+                    "In early stages, complete surgical removal of the tumor is the treatment of choice",
+                    "Surgery is only performed after chemotherapy has reduced tumor size",
+                    "Surgery is only used for diagnostic purposes, never for treatment"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Assessment of Neuroblastoma",
+                question: "Which of the following is NOT a typical finding in a child with neuroblastoma?",
+                options: [
+                    "Firm, nontender, irregular mass in the abdomen that crosses the midline",
+                    "Lymphadenopathy in the cervical and supraclavicular areas",
+                    "Elevated blood pressure",
+                    "Pallor, weakness, and anorexia"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Assessment of Neuroblastoma",
+                question: "True or False: Supraorbital ecchymosis, periorbital edema, and exophthalmos may result from invasion of retrobulbar soft tissue in neuroblastoma.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Assessment of Neuroblastoma",
+                question: "Which of the following might a child with neuroblastoma experience if there is spinal cord compression?",
+                options: [
+                    "Seizures",
+                    "Paralysis",
+                    "Hypertension",
+                    "Visual disturbances"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Interventions for Neuroblastoma",
+                question: "Which of the following is an important postoperative nursing intervention for a child with neuroblastoma?",
+                options: [
+                    "Restricting parental visitation to prevent infection",
+                    "Encouraging parents to express their feelings",
+                    "Maintaining the child on bed rest for several weeks",
+                    "Limiting fluid intake"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Interventions for Neuroblastoma",
+                question: "True or False: Parents of children with neuroblastoma may feel guilt for not having recognized signs in the child earlier.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Interventions for Neuroblastoma",
+                question: "Postoperative care for a child with neuroblastoma includes:",
+                options: [
+                    "Monitoring for complications related to the location of the surgery",
+                    "Encouraging increased physical activity immediately",
+                    "Avoiding discussion of prognosis",
+                    "Restricting dietary intake"
+                ],
+                correctIndex: 0
+            },
+            {
+                topic: "Osteosarcoma",
+                question: "Osteosarcoma is:",
+                options: [
+                    "A tumor of the kidney",
+                    "A tumor of the liver",
+                    "The most common bone cancer in children",
+                    "A malignancy of the lymph nodes"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Osteosarcoma",
+                question: "True or False: Osteosarcoma is usually found in the metaphysis of long bones, especially in the lower extremities.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Osteosarcoma",
+                question: "The peak age of incidence for osteosarcoma is:",
+                options: [
+                    "Infancy",
+                    "5-10 years",
+                    "10-25 years",
+                    "Over 30 years"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Assessment and Interventions for Osteosarcoma",
+                question: "Which of the following is NOT a typical assessment finding in osteosarcoma?",
+                options: [
+                    "Localized pain at the affected site",
+                    "Progressive limited range of motion",
+                    "Painless swelling",
+                    "Pathological fractures at the tumor site"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Assessment and Interventions for Osteosarcoma",
+                question: "True or False: Symptoms of osteosarcoma in the earliest stage are almost always attributed to extremity injury or normal growing pains.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Assessment and Interventions for Osteosarcoma",
+                question: "Which of the following is an important nursing intervention for a child with osteosarcoma?",
+                options: [
+                    "Avoiding discussion of potential limb loss",
+                    "Restricting mobility to prevent pathological fractures",
+                    "Assisting the child in dealing with problems of self-image",
+                    "Encouraging weight-bearing activities to strengthen the bone"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Brain Tumors",
+                question: "The most common brain tumor in children is:",
+                options: [
+                    "Supratentorial tumor",
+                    "Infratentorial tumor",
+                    "Pituitary tumor",
+                    "Pineal gland tumor"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Brain Tumors",
+                question: "True or False: An infratentorial tumor is located within the anterior two-thirds of the brain.",
+                options: ["True", "False"],
+                correctIndex: 1
+            },
+            {
+                topic: "Brain Tumors",
+                question: "The most common diagnostic procedure used to determine the location and extent of a brain tumor is:",
+                options: [
+                    "Computed tomography (CT) scan",
+                    "Positron emission tomography (PET) scan",
+                    "Magnetic resonance imaging (MRI)",
+                    "X-ray"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Assessment of Brain Tumors",
+                question: "Which of the following is a common symptom of a brain tumor in children?",
+                options: [
+                    "Headache that is worse in the evening and improves in the morning",
+                    "Headache that is worse on awakening and improves during the day",
+                    "Frequent urination",
+                    "Increased appetite"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Assessment of Brain Tumors",
+                question: "True or False: Vomiting associated with a brain tumor is usually related to feeding or eating.",
+                options: ["True", "False"],
+                correctIndex: 1
+            },
+            {
+                topic: "Assessment of Brain Tumors",
+                question: "Which of the following is a typical symptom of a brain tumor in children?",
+                options: [
+                    "Hypotension",
+                    "Diplopia",
+                    "Increased coordination",
+                    "Constipation"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Preoperative Interventions for Brain Tumors",
+                question: "Which of the following is NOT a typical preoperative nursing intervention for a child with a brain tumor?",
+                options: [
+                    "Performing a neurological assessment",
+                    "Instituting seizure precautions",
+                    "Assessing weight loss and nutritional status",
+                    "Encouraging the child to shave their own head"
+                ],
+                correctIndex: 3
+            },
+            {
+                topic: "Preoperative Interventions for Brain Tumors",
+                question: "True or False: It's important to tell the child that they will wake up with a large head dressing after brain surgery.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Preoperative Interventions for Brain Tumors",
+                question: "Signs of increased intracranial pressure in a child with a brain tumor should be:",
+                options: [
+                    "Monitored weekly",
+                    "Reported immediately to the healthcare provider",
+                    "Treated with over-the-counter pain medication",
+                    "Expected as normal after diagnosis"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Postoperative Interventions for Brain Tumors",
+                question: "Which of the following is NOT a typical postoperative nursing intervention for a child after brain tumor surgery?",
+                options: [
+                    "Assessing neurological and motor function",
+                    "Monitoring temperature closely",
+                    "Encouraging coughing and deep breathing exercises",
+                    "Monitoring for signs of meningitis"
+                ],
+                correctIndex: 2
+            },
+            {
+                topic: "Postoperative Interventions for Brain Tumors",
+                question: "True or False: Colorless drainage on the dressing or from the ears or nose may indicate cerebrospinal fluid leakage and should be reported immediately.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Postoperative Interventions for Brain Tumors",
+                question: "Which of the following is an important nursing intervention after brain tumor surgery?",
+                options: [
+                    "Changing the head dressing as needed without specific prescription",
+                    "Promoting measures that prevent vomiting",
+                    "Placing the patient in Trendelenburg's position to increase cerebral blood flow",
+                    "Encouraging visitors to stimulate the child"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Positioning After Craniotomy",
+                question: "If a large brain tumor has been removed, the child should NOT be placed:",
+                options: [
+                    "In a flat position",
+                    "On the operative side",
+                    "With the head slightly elevated",
+                    "With the neck in neutral position"
+                ],
+                correctIndex: 1
+            },
+            {
+                topic: "Positioning After Craniotomy",
+                question: "True or False: In an infratentorial procedure, the child is usually positioned flat and on either side.",
+                options: ["True", "False"],
+                correctIndex: 0
+            },
+            {
+                topic: "Positioning After Craniotomy",
+                question: "After a supratentorial procedure, how should the child's head be positioned?",
+                options: [
+                    "Flat and level with the heart",
+                    "Below the heart level",
+                    "Elevated above the heart level",
+                    "In Trendelenburg's position"
+                ],
+                correctIndex: 2
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answeredQuestions = new Map(); // Map to track answered (correct/incorrect) and skipped questions
+        let correctStreak = 0;
+        let incorrectStreak = 0;
+        
+        // GIF URLs based on streak
+        const gifUrls = {
+            start: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcjh1ZHBqbHhvajI2M3k2dWUzMm01cnVtZmU1YTd3eWs1aTB5azZrciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/WNlsQiGMU387hn7UZQ/giphy.gif",
+            correct1: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDhsbzRldjlldDVybml2NnhpODl4ZG55emh1YzNwNDRrbHJ2aG41dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/Z9uERnzkW098ezsfMu/giphy.gif",
+            correct2: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExczQzNHg0eDRtNHc3N2wweWw0amdhdHc5MXA3OWNtajQwNDZ3dHV1YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/2SY3OXaqDf4Pbaiues/giphy.gif",
+            correct3plus: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZm5maDdlM204aW96OGMweDI5cXpnajlybDRxNzN1Ymhod2NncWZxNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/fjxupFeOlzwRnhKT0b/giphy.gif",
+            incorrect1: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXd3b2l4ZTN3bGwxZmd1eXU4cGduaDc5cW56N3N6czRyaG00MmttbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/KdB5DnYdadrJMWP6Rz/giphy.gif",
+            incorrect2: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3VxcnNyMnUwcmlzNm1kdGR0NnhrZjU3ZXB6MHI5eG10Ymp2NzFyNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/dEZKOYuY4oQhMOZGEU/giphy.gif",
+            incorrect3plus: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZm1vcHpwYmQ5YjAxMmxxenRlYWZreTBvcDN5YnUyZG92OGx3cWhleSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/SVkhYVCi8fKPKvypi6/giphy.gif",
+            perfect: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGQyODJyeXVkZDBta2E3a3VpZ2R0MnRqOGxobHcya2hoeWQxdzI4dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/MCEneemI5TEZmzeiZk/giphy.gif",
+            good: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGF3MGloMzQ5eHllb2oxZjZmOWlhZmh3NGFieHR1eDE1dDcxZzdzciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/XoM1eSwGMXK4huqV2E/giphy.gif",
+            needsWork: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGdjMWM0OGh5dW5xZWM2MnE2aXZuYmcwdXZxeXgwcXdnbWR6N2xociZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/U1gI8F6VMe4HmHBlwS/giphy.gif"
+        };
+        
+        function loadQuestion() {
+            const questionContainer = document.getElementById('question-container');
+            const question = questions[currentQuestion];
+            
+            // Clear previous question
+            questionContainer.innerHTML = '';
+            
+            // Create question element
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question active';
+            
+            // Add topic
+            const topicElement = document.createElement('div');
+            topicElement.className = 'topic-title';
+            topicElement.textContent = question.topic;
+            questionElement.appendChild(topicElement);
+            
+            // Add question text
+            const questionTextElement = document.createElement('div');
+            questionTextElement.className = 'question-text';
+            
+            // Check if this question was skipped before
+            const wasSkipped = answeredQuestions.get(currentQuestion) === 'skipped';
+            if (wasSkipped) {
+                questionTextElement.innerHTML = `${question.question} <span class="skipped-label">Previously Skipped</span>`;
+            } else {
+                questionTextElement.textContent = question.question;
+            }
+            
+            questionElement.appendChild(questionTextElement);
+            
+            // Add options
+            const optionsElement = document.createElement('div');
+            optionsElement.className = 'options';
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.dataset.index = index;
+                optionElement.addEventListener('click', selectOption);
+                optionsElement.appendChild(optionElement);
+            });
+            
+            questionElement.appendChild(optionsElement);
+            
+            // Add feedback area
+            const feedbackElement = document.createElement('div');
+            feedbackElement.className = 'feedback';
+            feedbackElement.id = 'feedback';
+            questionElement.appendChild(feedbackElement);
+            
+            questionContainer.appendChild(questionElement);
+            
+            // Update progress
+            updateProgress();
+            
+            // Enable/disable navigation buttons
+            document.getElementById('prev-btn').disabled = currentQuestion === 0;
+            document.getElementById('next-btn').disabled = !answeredQuestions.has(currentQuestion) || answeredQuestions.get(currentQuestion) === 'skipped';
+            document.getElementById('first-btn').disabled = currentQuestion === 0;
+            document.getElementById('last-btn').disabled = currentQuestion === questions.length - 1;
+            
+            // If this question was already answered and not skipped, show the previous result
+            if (answeredQuestions.has(currentQuestion) && answeredQuestions.get(currentQuestion) !== 'skipped') {
+                showPreviousAnswer();
+            }
+        }
+        
+        function updateMascotGif(isCorrect) {
+            const mascotGif = document.getElementById('mascot-gif');
+            
+            if (isCorrect === 'start') {
+                mascotGif.src = gifUrls.start;
+                return;
+            }
+            
+            if (isCorrect) {
+                incorrectStreak = 0;
+                correctStreak++;
+                
+                if (correctStreak === 1) {
+                    mascotGif.src = gifUrls.correct1;
+                } else if (correctStreak === 2) {
+                    mascotGif.src = gifUrls.correct2;
+                } else {
+                    mascotGif.src = gifUrls.correct3plus;
+                }
+            } else {
+                correctStreak = 0;
+                incorrectStreak++;
+                
+                if (incorrectStreak === 1) {
+                    mascotGif.src = gifUrls.incorrect1;
+                } else if (incorrectStreak === 2) {
+                    mascotGif.src = gifUrls.incorrect2;
+                } else {
+                    mascotGif.src = gifUrls.incorrect3plus;
+                }
+            }
+        }
+        
+        function showPreviousAnswer() {
+            const correctIndex = questions[currentQuestion].correctIndex;
+            const options = document.querySelectorAll('.option');
+            const answerStatus = answeredQuestions.get(currentQuestion);
+            
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.classList.add('correct');
+                }
+                
+                if (answerStatus === 'incorrect' && index !== correctIndex) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            // Show feedback
+            const feedback = document.getElementById('feedback');
+            feedback.style.display = 'block';
+            feedback.textContent = `The correct answer is: ${questions[currentQuestion].options[correctIndex]}`;
+            feedback.style.borderColor = answerStatus === 'correct' ? '#28a745' : '#dc3545';
+            
+            // Enable next button
+            document.getElementById('next-btn').disabled = false;
+        }
+        
+        function selectOption(event) {
+            // If already answered (but not skipped), do nothing
+            if (answeredQuestions.has(currentQuestion) && answeredQuestions.get(currentQuestion) !== 'skipped') {
+                return;
+            }
+            
+            const selectedOption = event.target;
+            const selectedIndex = parseInt(selectedOption.dataset.index);
+            const correctIndex = questions[currentQuestion].correctIndex;
+            
+            // Clear any previous selection
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // Mark this option as selected
+            selectedOption.classList.add('selected');
+            
+            // Check if correct
+            const isCorrect = selectedIndex === correctIndex;
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+                if (!answeredQuestions.has(currentQuestion) || answeredQuestions.get(currentQuestion) === 'skipped') {
+                    score++;
+                }
+                answeredQuestions.set(currentQuestion, 'correct');
+            } else {
+                selectedOption.classList.add('incorrect');
+                options[correctIndex].classList.add('correct');
+                answeredQuestions.set(currentQuestion, 'incorrect');
+            }
+            
+            // Update mascot GIF
+            updateMascotGif(isCorrect);
+            
+            // Show feedback
+            const feedback = document.getElementById('feedback');
+            feedback.style.display = 'block';
+            if (isCorrect) {
+                feedback.textContent = 'Correct! Well done.';
+                feedback.style.borderColor = '#28a745';
+            } else {
+                feedback.textContent = `Incorrect. The correct answer is: ${questions[currentQuestion].options[correctIndex]}`;
+                feedback.style.borderColor = '#dc3545';
+            }
+            
+            // Enable next button
+            document.getElementById('next-btn').disabled = false;
+            
+            // Update score tracker
+            updateScoreTracker();
+        }
+        
+        function skipQuestion() {
+            // Mark as skipped only if not already answered
+            if (!answeredQuestions.has(currentQuestion) || answeredQuestions.get(currentQuestion) === 'skipped') {
+                answeredQuestions.set(currentQuestion, 'skipped');
+            }
+            
+            nextQuestion();
+        }
+        
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+        
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+        
+        function goToFirstQuestion() {
+            currentQuestion = 0;
+            loadQuestion();
+        }
+        
+        function goToLastQuestion() {
+            currentQuestion = questions.length - 1;
+            loadQuestion();
+        }
+        
+        function updateProgress() {
+            const progressText = document.getElementById('progress-text');
+            progressText.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            
+            const progressFill = document.getElementById('progress-fill');
+            const percentage = ((currentQuestion + 1) / questions.length) * 100;
+            progressFill.style.width = `${percentage}%`;
+        }
+        
+        function updateScoreTracker() {
+            const scoreTracker = document.getElementById('score-tracker');
+            const percentage = (score / questions.length * 100).toFixed(1);
+            scoreTracker.textContent = `Correct: ${score}/${questions.length} (${percentage}%)`;
+        }
+        
+        function showResults() {
+            document.getElementById('question-container').style.display = 'none';
+            document.getElementById('prev-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('skip-btn').style.display = 'none';
+            document.getElementById('first-btn').style.display = 'none';
+            document.getElementById('last-btn').style.display = 'none';
+            document.querySelector('.progress').style.display = 'none';
+            document.querySelector('.mascot-container').style.display = 'none';
+            
+            const resultContainer = document.getElementById('result-container');
+            resultContainer.style.display = 'block';
+            
+            const scoreDisplay = document.getElementById('score-display');
+            const percentage = (score / questions.length * 100).toFixed(1);
+            scoreDisplay.textContent = `${score}/${questions.length} (${percentage}%)`;
+            
+            // Count skipped questions
+            let skippedCount = 0;
+            answeredQuestions.forEach((status) => {
+                if (status === 'skipped') skippedCount++;
+            });
+            
+            const skippedInfo = document.getElementById('skipped-questions-info');
+            if (skippedCount > 0) {
+                skippedInfo.textContent = `You skipped ${skippedCount} question${skippedCount > 1 ? 's' : ''}.`;
+            } else {
+                skippedInfo.textContent = 'You answered all questions!';
+            }
+            
+            // Add result message and GIF based on score percentage
+            const resultMessage = document.getElementById('result-message');
+            const resultGif = document.getElementById('result-gif');
+            const scorePercentage = (score / questions.length) * 100;
+            
+            if (scorePercentage === 100) {
+                resultMessage.textContent = "Perfect score! Amazing job!";
+                resultGif.src = gifUrls.perfect;
+            } else if (scorePercentage >= 70) {
+                resultMessage.textContent = "You could rest now!";
+                resultGif.src = gifUrls.good;
+            } else {
+                resultMessage.textContent = "Study harder!";
+                resultGif.src = gifUrls.needsWork;
+            }
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answeredQuestions = new Map();
+            correctStreak = 0;
+            incorrectStreak = 0;
+            
+            document.getElementById('question-container').style.display = 'block';
+            document.getElementById('prev-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'inline-block';
+            document.getElementById('skip-btn').style.display = 'inline-block';
+            document.getElementById('first-btn').style.display = 'inline-block';
+            document.getElementById('last-btn').style.display = 'inline-block';
+            document.querySelector('.progress').style.display = 'block';
+            document.querySelector('.mascot-container').style.display = 'block';
+            document.getElementById('result-container').style.display = 'none';
+            
+            // Reset to start GIF
+            updateMascotGif('start');
+            
+            updateScoreTracker();
+            loadQuestion();
+        }
+        
+        // Set up event listeners
+        document.getElementById('next-btn').addEventListener('click', nextQuestion);
+        document.getElementById('prev-btn').addEventListener('click', prevQuestion);
+        document.getElementById('skip-btn').addEventListener('click', skipQuestion);
+        document.getElementById('first-btn').addEventListener('click', goToFirstQuestion);
+        document.getElementById('last-btn').addEventListener('click', goToLastQuestion);
+        document.getElementById('restart-btn').addEventListener('click', restartQuiz);
+        
+        // Initialize score tracker
+        updateScoreTracker();
+        
+        // Load the first question
+        loadQuestion();
+    </script>
+</body>
+</html>
